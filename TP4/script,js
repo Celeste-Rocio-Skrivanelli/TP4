@@ -1,0 +1,64 @@
+let archivoBlob = null;
+
+// Obtenemos los botones del HTML por su ID
+const btnCrear = document.getElementById("btnCrear");
+const btnDescargar = document.getElementById("btnDescargar");
+const btnSlice = document.getElementById("btnSlice");
+
+// -------------------------------------------------------------
+// BOTÓN 1: CREAR EL BLOB
+// -------------------------------------------------------------
+btnCrear.addEventListener("click", () => {
+    const contenido = "Hola Mundo! Este texto está guardado dentro de un Blob.";
+    
+    // Creamos el archivo virtual
+    archivoBlob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+
+    alert("¡Blob creado con éxito en memoria! Tamaño: " + archivoBlob.size + " bytes.");
+});
+
+// -------------------------------------------------------------
+// BOTÓN 2: DESCARGAR EL BLOB
+// -------------------------------------------------------------
+btnDescargar.addEventListener("click", () => {
+    // Verificamos si primero se presionó el botón de crear
+    if (!archivoBlob) {
+        alert("Primero presiona 'Crear Blob de texto'.");
+        return;
+    }
+
+    // 1. Generamos una URL en memoria para el Blob
+    const url = URL.createObjectURL(archivoBlob);
+
+    // 2. Creamos un enlace invisible
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "nota.txt"; // Nombre del archivo que se guardará en tu PC
+
+    // 3. Hacemos clic automático
+    document.body.appendChild(link);
+    link.click();
+
+    // 4. Borramos el enlace y liberamos la memoria
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+});
+
+// -------------------------------------------------------------
+// BOTÓN 3: USAR SLICE()
+// -------------------------------------------------------------
+btnSlice.addEventListener("click", async () => {
+    if (!archivoBlob) {
+        alert("Primero presiona 'Crear Blob de texto'.");
+        return;
+    }
+
+    // Cortamos los primeros 10 caracteres (del índice 0 al 10)
+    // De "Hola Mundo! Este texto..." se queda con "Hola Mundo"
+    const trozoBlob = archivoBlob.slice(0, 10, "text/plain");
+
+    // Leemos el texto del trozo que acabamos de cortar
+    const textoDelTrozo = await trozoBlob.text();
+
+    alert("Texto extraído con slice(0, 10):\n" + textoDelTrozo);
+});
